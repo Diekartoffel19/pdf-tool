@@ -1,27 +1,40 @@
-# PDF Toolkit (Rust Native Edition)
+# PDF Werkzeugkasten (PDF Toolkit Desktop)
 
-Ein extrem leichtgewichtiges (nur 1.8 MB Einzeldatei), schnelles und 100% lokales PDF-Werkzeug nach dem Vorbild von PDF24.
+100% native Rust Desktop-Applikation zur vollständigen Offline-Bearbeitung und Verwaltung von PDF-Dateien. Keine Web-App, kein Electron, keine Cloud-Abhängigkeiten.
 
-## Vorteile der Rust-Version
-- **Single-Binary**: Nur eine einzige ausführbare Datei `pdf-toolkit-rust.exe` (1.8 MB), HTML/CSS/JS sind direkt im Binary eingebettet.
-- **Keine Abhängigkeiten**: Kein Python, kein Node.js, keine externen Runtimes nötig.
-- **Minimale Ressourcennutzung**: Benötigt im Betrieb weniger als 15 MB Arbeitsspeicher.
-- **Dark Mode**: Standardmäßig aktives dunkles Theme mit schnellem Umschalter.
-- **100% Lokal**: Sämtliche PDF-Verarbeitung geschieht nativ auf deinem PC.
+## Funktionsübersicht
 
-## Enthaltene Funktionen
-1. PDF zusammenfügen (Merge)
-2. PDF teilen & extrahieren (Split in Bereiche oder alle Seiten als ZIP)
-3. Seiten verwalten & drehen (Visuelle Thumbnails, 90°-Drehung, Verschieben, Löschen)
-4. PDF komprimieren (Stream-Deflation & Objekt-Pruning)
-5. Bilder zu PDF (JPEG zu A4-PDF)
-6. Wasserzeichen einfügen
-7. Seitenzahlen nummerieren
-8. Text extrahieren (.txt)
+1. **📄 Zusammenführen (Merge)**: Beliebig viele PDFs in wählbarer Reihenfolge zu einem Dokument verbinden.
+2. **✂️ Teilen & Extrahieren (Split)**:
+   - Bestimmte Seitenbereiche (z.B. `1-3, 5, 8-10`) in eine neue PDF extrahieren.
+   - Jede einzelne Seite automatisch als separate Datei exportieren.
+3. **🔄 Seiten Drehen (Rotate)**: Alle oder ausgewählte Seiten um 90°, 180° oder 270° drehen.
+4. **🗑️ Seiten Löschen (Delete)**: Überflüssige Seiten aus Dokumenten entfernen und Dokumentenstruktur bereinigen.
+5. **🗜️ Komprimieren (Compress & Optimize)**: Dateigröße mit Object-Streams und Cross-Reference-Streams (Level 9) drastisch verkleinern.
+6. **🖼️ Bilder zu PDF (Images to PDF)**: Bilder (JPG, PNG, BMP) in ein mehrseitiges PDF umwandeln.
+7. **🔍 Bilder Extrahieren (Extract Images)**: Alle eingebetteten Bild-Objekte (JPG / PNG) aus PDFs exportieren.
+8. **🔒 Verschlüsseln & Schützen (Security)**: Öffnungs- und Besitzer-Passwort mit AES-128 oder AES-256 vergeben.
+9. **🔓 Entschlüsseln (Decrypt)**: Passwortgeschützte PDFs entsperren und ohne Kennwort abspeichern.
+10. **📝 Metadaten-Editor**: Titel, Autor, Thema, Stichwörter, Ersteller und Producer lesen und anpassen.
+11. **📊 Analyse & Text-Extraktion**: Dokumenten-Details (Objekte, Version, Verschlüsselung) und Text aus Seiten auslesen.
 
-## Starten
-Einfach die Datei `start.bat` doppelklicken oder direkt die Binärdatei ausführen:
+## Technische Details
+
+- **Sprache**: 100% Rust (Edition 2024)
+- **GUI-Framework**: `eframe` / `egui` (native GPU-beschleunigte Desktop-Oberfläche, 0% WebView)
+- **PDF-Engine**: `lopdf` mit `embed_image` Feature
+- **Bildverarbeitung**: `image`
+- **Native Datei-Dialoge**: `rfd` (Windows API FileDialogs)
+
+## Windows Installer & Starten
+
+### Installer erstellen & ausführen:
 ```powershell
-.\target\release\pdf-toolkit-rust.exe
+.\build-installer.ps1
+.\dist\PDF_Werkzeugkasten_Setup_v1.0.0.exe
 ```
-Der Standardbrowser öffnet sich automatisch unter `http://127.0.0.1:8080`.
+
+### Manuell starten (ohne Installer):
+```powershell
+cargo run --release
+```

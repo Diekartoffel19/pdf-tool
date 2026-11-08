@@ -1,20 +1,20 @@
 [package]
 name = "pdf-toolkit-rust"
-version = "0.1.0"
-edition = "2021"
-
-[[bin]]
-name = "pdf-toolkit"
-path = "src/main.rs"
-
-[[bin]]
-name = "pdf-toolkit-installer"
-path = "src/installer.rs"
+version = "1.0.0"
+edition = "2024"
+authors = ["PDF Toolkit"]
+description = "Native Rust PDF Werkzeugkasten Desktop Application"
 
 [dependencies]
-tiny_http = "0.12"
-lopdf = "0.34"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-zip = { version = "2.2", default-features = false, features = ["deflate"] }
-base64 = "0.22"
+eframe = "0.31"
+lopdf = { version = "0.38", features = ["embed_image"] }
+rfd = "0.15"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
+rand = "0.9"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"

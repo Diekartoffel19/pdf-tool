@@ -1,0 +1,23 @@
+pub mod page_range;
+pub mod merge;
+pub mod split;
+pub mod rotate;
+pub mod delete;
+pub mod compress;
+pub mod images_to_pdf;
+pub mod extract_images;
+pub mod security;
+pub mod metadata;
+pub mod text_info;
+
+pub use page_range::parse_page_ranges;
+pub use merge::merge_pdfs;
+pub use split::{extract_pages, split_all_pages};
+pub use rotate::rotate_pdf;
+pub use delete::delete_pages_from_pdf;
+pub use compress::{compress_pdf, CompressResult};
+pub use images_to_pdf::convert_images_to_pdf;
+pub use extract_images::extract_images_from_pdf;
+pub use security::{encrypt_pdf, decrypt_pdf};
+pub use metadata::{read_metadata, write_metadata, PdfMetadata};
+pub use text_info::{get_pdf_details, extract_text, PdfDetails};
