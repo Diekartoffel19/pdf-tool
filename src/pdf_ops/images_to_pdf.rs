@@ -2,7 +2,19 @@ use lopdf::content::{Content, Operation};
 use lopdf::{dictionary, Document, Object, Stream};
 use std::path::{Path, PathBuf};
 
-pub fn convert_images_to_pdf(image_paths: &[PathBuf], output_path: &Path) -> Result<usize, String> {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ImagePageLayout {
+    OriginalSize,
+    A4Portrait,
+    A4Landscape,
+}
+
+pub fn convert_images_to_pdf(
+    image_paths: &[PathBuf],
+    layout: ImagePageLayout,
+    margin_pt: f32,
+    output_path: &Path,
+) -> Result<usize, String> {
     if image_paths.is_empty() {
         return Err("Mindestens ein Bild erforderlich".to_string());
     }
@@ -15,8 +27,28 @@ pub fn convert_images_to_pdf(image_paths: &[PathBuf], output_path: &Path) -> Res
         let img = image::open(img_path)
             .map_err(|e| format!("Fehler beim Öffnen von '{}': {e}", img_path.display()))?;
 
-        let width = img.width() as f32;
-        let height = img.height() as f32;
+        let img_w = img.width().max(1) as f32;
+        let img_h = img.height().max(1) as f32;
+
+        let (page_w, page_h, draw_w, draw_h, offset_x, offset_y) = match layout {
+            ImagePageLayout::OriginalSize => (img_w, img_h, img_w, img_h, 0.0, 0.0),
+            ImagePageLayout::A4Portrait | ImagePageLayout::A4Landscape => {
+                let (pw, ph) = if layout == ImagePageLayout::A4Portrait {
+                    (595.28_f32, 841.89_f32)
+                } else {
+                    (841.89_f32, 595.28_f32)
+                };
+                let m = margin_pt.clamp(0.0, 120.0);
+                let avail_w = (pw - 2.0 * m).max(50.0);
+                let avail_h = (ph - 2.0 * m).max(50.0);
+                let scale = (avail_w / img_w).min(avail_h / img_h);
+                let dw = img_w * scale;
+                let dh = img_h * scale;
+                let ox = (pw - dw) / 2.0;
+                let oy = (ph - dh) / 2.0;
+                (pw, ph, dw, dh, ox, oy)
+            }
+        };
 
         let image_stream = lopdf::xobject::image(img_path)
             .map_err(|e| format!("Fehler beim Einbetten des Bildes '{}': {e}", img_path.display()))?;
@@ -29,12 +61,12 @@ pub fn convert_images_to_pdf(image_paths: &[PathBuf], output_path: &Path) -> Res
                 Operation::new(
                     "cm",
                     vec![
-                        (width as i64).into(),
+                        Object::Real(draw_w),
                         0.into(),
                         0.into(),
-                        (height as i64).into(),
-                        0.into(),
-                        0.into(),
+                        Object::Real(draw_h),
+                        Object::Real(offset_x),
+                        Object::Real(offset_y),
                     ],
                 ),
                 Operation::new("Do", vec![Object::Name(b"Im0".to_vec())]),
@@ -58,7 +90,12 @@ pub fn convert_images_to_pdf(image_paths: &[PathBuf], output_path: &Path) -> Res
         let page = dictionary! {
             "Type" => "Page",
             "Parent" => pages_id,
-            "MediaBox" => vec![0.into(), 0.into(), (width as i64).into(), (height as i64).into()],
+            "MediaBox" => vec![
+                0.into(),
+                0.into(),
+                Object::Real(page_w),
+                Object::Real(page_h),
+            ],
             "Resources" => resources_id,
             "Contents" => content_id,
         };

@@ -5,11 +5,31 @@ use std::collections::BTreeMap;
 use std::path::Path;
 use std::sync::Arc;
 
+#[derive(Debug, Clone)]
+pub struct SecurityPermissions {
+    pub allow_print: bool,
+    pub allow_copy: bool,
+    pub allow_modify: bool,
+    pub allow_annotations: bool,
+}
+
+impl Default for SecurityPermissions {
+    fn default() -> Self {
+        Self {
+            allow_print: true,
+            allow_copy: true,
+            allow_modify: false,
+            allow_annotations: true,
+        }
+    }
+}
+
 pub fn encrypt_pdf(
     input_path: &Path,
     user_password: &str,
     owner_password: &str,
     use_aes256: bool,
+    perms: &SecurityPermissions,
     output_path: &Path,
 ) -> Result<(), String> {
     if user_password.is_empty() && owner_password.is_empty() {
@@ -30,10 +50,19 @@ pub fn encrypt_pdf(
         return Err("Dokument ist bereits verschlüsselt".to_string());
     }
 
-    let permissions = Permissions::PRINTABLE
-        | Permissions::COPYABLE
-        | Permissions::COPYABLE_FOR_ACCESSIBILITY
-        | Permissions::PRINTABLE_IN_HIGH_QUALITY;
+    let mut permissions = Permissions::empty();
+    if perms.allow_print {
+        permissions |= Permissions::PRINTABLE | Permissions::PRINTABLE_IN_HIGH_QUALITY;
+    }
+    if perms.allow_copy {
+        permissions |= Permissions::COPYABLE | Permissions::COPYABLE_FOR_ACCESSIBILITY;
+    }
+    if perms.allow_modify {
+        permissions |= Permissions::MODIFIABLE | Permissions::ASSEMBLABLE;
+    }
+    if perms.allow_annotations {
+        permissions |= Permissions::ANNOTABLE | Permissions::FILLABLE;
+    }
 
     let mut file_encryption_key = [0u8; 32];
 

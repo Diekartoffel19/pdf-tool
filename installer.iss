@@ -1,7 +1,5 @@
-; Inno Setup Script für PDF Werkzeugkasten
-
-#define MyAppName "PDF Werkzeugkasten"
-#define MyAppVersion "1.0.0"
+#define MyAppName "PDF Werkzeugkasten Pro"
+#define MyAppVersion "2.0.0"
 #define MyAppPublisher "PDF Werkzeugkasten"
 #define MyAppExeName "pdf-toolkit-rust.exe"
 
@@ -14,7 +12,7 @@ DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 OutputDir=dist
-OutputBaseFilename=PDF_Werkzeugkasten_Setup_v1.0.0
+OutputBaseFilename=PDF_Werkzeugkasten_Pro_Setup_v2.0.0
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
